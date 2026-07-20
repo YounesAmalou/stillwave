@@ -19,6 +19,8 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
+from app.model_runtime import unpack_df_runtime
+
 LOGGER = logging.getLogger("stillwave")
 logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO"))
 
@@ -184,9 +186,10 @@ async def lifespan(_: FastAPI):
     if os.getenv("STILLWAVE_SKIP_MODEL") != "1":
         from df.enhance import init_df
         LOGGER.info("Loading %s", DF_MODEL_LABEL)
-        model, df_state, _, _ = await asyncio.to_thread(
+        initialized = await asyncio.to_thread(
             init_df, DF_MODEL, True, "WARNING", None
         )
+        model, df_state = unpack_df_runtime(initialized)
         model.eval()
         model_store.update(model=model, df_state=df_state)
         LOGGER.info("%s ready", DF_MODEL_LABEL)
