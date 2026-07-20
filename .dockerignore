@@ -1,0 +1,14 @@
+.git
+.github
+.idea
+.vscode
+node_modules
+dist
+outputs
+work
+__pycache__
+.pytest_cache
+.venv
+*.pyc
+*.log
+.env

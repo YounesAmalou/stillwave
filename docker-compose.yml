@@ -1,0 +1,24 @@
+services:
+  stillwave:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "${PORT:-3000}:8000"
+    environment:
+      DF_MODEL: DeepFilterNet3
+      JOB_TTL_SECONDS: 3600
+      MAX_UPLOAD_BYTES: 52428800
+      MAX_DURATION_SECONDS: 600
+      TORCH_NUM_THREADS: ${TORCH_NUM_THREADS:-2}
+      LOG_LEVEL: INFO
+    tmpfs:
+      - /tmp/stillwave-jobs:size=512m,mode=0700,uid=999,gid=999
+    restart: unless-stopped
+    stop_grace_period: 30s
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      start_period: 90s
+      retries: 3
