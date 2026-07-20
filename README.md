@@ -73,6 +73,7 @@ Open `http://localhost:3000`. Coolify can deploy this repository directly with t
 - The displayed paid plans are product presentation only; billing and quota enforcement are not included.
 - Reverse-proxy request limits must allow 50 MB uploads and processing requests should remain on HTTPS for browser microphone permission.
 - Music is not the target input. DeepFilterNet is optimized for speech enhancement.
+- PyTorch is intentionally pinned to the DeepFilterNet 0.5.6-compatible runtime. The service never deserializes user-supplied models: its only `torch.load` input is the bundled checkpoint verified by SHA-256 during the image build.
 
 ## Model attribution
 
