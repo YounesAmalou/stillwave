@@ -51,7 +51,7 @@ The Vite server proxies `/api` to port 8000.
 
 ## Docker / Coolify
 
-The image bakes the DeepFilterNet3 checkpoint during the build, so runtime startup does not depend on GitHub. The first build is intentionally large and can take several minutes because it installs CPU PyTorch and downloads model weights.
+The repository includes the official 7.6 MB DeepFilterNet3 checkpoint archive. The Docker build verifies its SHA-256 checksum (`49c52edc…2284d2`), extracts it into the image, and validates that the Python/native runtime can load it. Neither the image build nor production startup depends on an anonymous GitHub model download. The first build is intentionally large and can take several minutes because it installs CPU PyTorch.
 
 ```bash
 docker compose build
@@ -76,4 +76,4 @@ Open `http://localhost:3000`. Coolify can deploy this repository directly with t
 
 ## Model attribution
 
-Audio enhancement uses [Rikorose/DeepFilterNet](https://github.com/Rikorose/DeepFilterNet), dual-licensed by its authors under MIT or Apache-2.0. Stillwave defaults to DeepFilterNet3 with its post-filter enabled.
+Audio enhancement uses [Rikorose/DeepFilterNet](https://github.com/Rikorose/DeepFilterNet), dual-licensed by its authors under MIT or Apache-2.0. The bundled `backend/models/DeepFilterNet3.zip` is the unmodified official checkpoint archive from that repository. Stillwave defaults to DeepFilterNet3 with its post-filter enabled.

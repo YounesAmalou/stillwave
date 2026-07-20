@@ -29,6 +29,7 @@ MAX_UPLOAD_BYTES = int(os.getenv("MAX_UPLOAD_BYTES", str(50 * 1024 * 1024)))
 MAX_DURATION_SECONDS = int(os.getenv("MAX_DURATION_SECONDS", "600"))
 JOB_TTL_SECONDS = int(os.getenv("JOB_TTL_SECONDS", "3600"))
 DF_MODEL = os.getenv("DF_MODEL", "DeepFilterNet3")
+DF_MODEL_LABEL = Path(DF_MODEL).name
 ALLOWED_TYPES = {
     "audio/wav", "audio/x-wav", "audio/wave", "audio/mpeg", "audio/mp3",
     "audio/mp4", "audio/x-m4a", "audio/ogg", "audio/webm", "video/webm",
@@ -182,13 +183,13 @@ async def lifespan(_: FastAPI):
     cleanup_task = asyncio.create_task(cleanup_jobs())
     if os.getenv("STILLWAVE_SKIP_MODEL") != "1":
         from df.enhance import init_df
-        LOGGER.info("Loading %s", DF_MODEL)
+        LOGGER.info("Loading %s", DF_MODEL_LABEL)
         model, df_state, _, _ = await asyncio.to_thread(
             init_df, DF_MODEL, True, "WARNING", None
         )
         model.eval()
         model_store.update(model=model, df_state=df_state)
-        LOGGER.info("%s ready", DF_MODEL)
+        LOGGER.info("%s ready", DF_MODEL_LABEL)
     yield
     cleanup_task.cancel()
     with suppress(asyncio.CancelledError):
@@ -209,7 +210,7 @@ app = FastAPI(
 async def health() -> dict[str, str]:
     if "model" not in model_store and os.getenv("STILLWAVE_SKIP_MODEL") != "1":
         raise HTTPException(status_code=503, detail="Audio engine is not ready")
-    return {"status": "ok", "model": DF_MODEL}
+    return {"status": "ok", "model": DF_MODEL_LABEL}
 
 
 @app.post("/api/jobs", response_model=JobResponse, status_code=status.HTTP_202_ACCEPTED)

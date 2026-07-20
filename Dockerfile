@@ -15,7 +15,7 @@ ENV PYTHONUNBUFFERED=1 \
     XDG_CACHE_HOME=/app/.cache \
     JOB_ROOT=/tmp/stillwave-jobs \
     STATIC_ROOT=/app/static \
-    DF_MODEL=DeepFilterNet3
+    DF_MODEL=/app/models/DeepFilterNet3
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
       ffmpeg libsndfile1 libgomp1 ca-certificates \
@@ -27,14 +27,19 @@ WORKDIR /app
 COPY backend/requirements.txt ./backend/requirements.txt
 RUN pip install --no-cache-dir -r backend/requirements.txt
 COPY backend/app ./backend/app
+COPY backend/models/DeepFilterNet3.zip /tmp/DeepFilterNet3.zip
 COPY --from=frontend /build/dist ./static
-RUN mkdir -p /app/.cache /tmp/stillwave-jobs \
+RUN echo "49c52edc8947ae1f9bf50d81530beaf3a2c3245aeaf34b6f31ff535cd22284d2  /tmp/DeepFilterNet3.zip" | sha256sum -c - \
+    && mkdir -p /app/models \
+    && python -m zipfile -e /tmp/DeepFilterNet3.zip /app/models \
+    && rm /tmp/DeepFilterNet3.zip \
+    && mkdir -p /app/.cache /tmp/stillwave-jobs \
     && chown -R stillwave:stillwave /app /tmp/stillwave-jobs
 
 USER stillwave
-# Bake the public DeepFilterNet3 checkpoint into the image so production startup
-# never depends on GitHub availability.
-RUN python -c "from df.enhance import init_df; init_df('DeepFilterNet3', post_filter=True, log_level='ERROR', log_file=None)"
+# Validate the bundled checkpoint and Python/native runtime during the image build.
+# The model path is local, so this never makes a network request.
+RUN python -c "from df.enhance import init_df; init_df('/app/models/DeepFilterNet3', post_filter=True, log_level='ERROR', log_file=None)"
 
 EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=90s --retries=3 \

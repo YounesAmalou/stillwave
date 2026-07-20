@@ -6,7 +6,7 @@ services:
     ports:
       - "${PORT:-3000}:8000"
     environment:
-      DF_MODEL: DeepFilterNet3
+      DF_MODEL: /app/models/DeepFilterNet3
       JOB_TTL_SECONDS: 3600
       MAX_UPLOAD_BYTES: 52428800
       MAX_DURATION_SECONDS: 600
