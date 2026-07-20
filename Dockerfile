@@ -18,7 +18,7 @@ ENV PYTHONUNBUFFERED=1 \
     DF_MODEL=/app/models/DeepFilterNet3
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-      ffmpeg libsndfile1 libgomp1 ca-certificates \
+      ffmpeg libsndfile1 libgomp1 ca-certificates git \
     && rm -rf /var/lib/apt/lists/* \
     && groupadd --system stillwave \
     && useradd --system --gid stillwave --home-dir /app --create-home stillwave

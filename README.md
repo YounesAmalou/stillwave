@@ -51,7 +51,7 @@ The Vite server proxies `/api` to port 8000.
 
 ## Docker / Coolify
 
-The repository includes the official 7.6 MB DeepFilterNet3 checkpoint archive. The Docker build verifies its SHA-256 checksum (`49c52edc…2284d2`), extracts it into the image, and validates that the Python/native runtime can load it. Neither the image build nor production startup depends on an anonymous GitHub model download. The first build is intentionally large and can take several minutes because it installs CPU PyTorch.
+The repository includes the official 7.6 MB DeepFilterNet3 checkpoint archive. The Docker build verifies its SHA-256 checksum (`49c52edc…2284d2`), extracts it into the image, and validates that the Python/native runtime can load it. Neither the image build nor production startup depends on an anonymous GitHub model download. The slim runtime includes Git because DeepFilterNet 0.5.6 queries repository metadata while initializing its logger. The first build is intentionally large and can take several minutes because it installs CPU PyTorch.
 
 ```bash
 docker compose build
